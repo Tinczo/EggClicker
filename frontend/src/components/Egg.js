@@ -11,7 +11,7 @@ function Egg({ onClick, isLoading }) {
       disabled={isLoading} // Używamy stanu 'isLoading' przekazanego z App.js
       style={{ background: 'none', border: 'none', cursor: 'pointer' }}
     >
-      <img src={eggImage} alt="Clickable Egg" style={{ width: '200px' }} />
+      <img src={eggImage} alt="Clickable Egg" />
     </button>
   );
 }

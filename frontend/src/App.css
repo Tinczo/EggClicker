@@ -1,38 +1,87 @@
+/* Resetowanie domyślnych stylów dla spójności */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #282c34; /* Ciemne tło jak wcześniej */
+  color: white; /* Domyślny kolor tekstu */
+}
+
+/* Główny kontener aplikacji '.App'
+  - Używamy Flexboxa, aby ułożyć elementy w kolumnie.
+  - 'height: 100vh' sprawia, że apka zajmuje całą wysokość ekranu.
+*/
 .App {
+  display: flex;
+  flex-direction: column; /* Układamy elementy pionowo (jeden pod drugim) */
+  height: 100vh; /* Pełna wysokość okna przeglądarki */
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* 1. Górny pasek nawigacyjny/nagłówek
+*/
+.app-navbar {
+  width: 100%;
+  padding: 10px 0; /* Trochę oddechu góra/dół */
+  background-color: #20232a; /* Lekko inny odcień tła */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Mały cień */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.app-navbar h1 {
+  font-size: 1.5rem; /* Mniejsza czcionka dla nagłówka */
+  margin: 0; /* Usuwamy domyślny margines */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* 2. Główna zawartość (kontener na jajko i licznik)
+  - 'flex: 1' to "magiczna" właściwość, która mówi:
+    "zajmij całą *pozostałą* wolną przestrzeń"
+  - Dzięki temu nagłówek jest na górze, a ta sekcja wypełnia resztę,
+    jednocześnie centrując zawartość.
+*/
+.app-content {
+  flex: 1; /* Wypełnij pozostałą przestrzeń */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex-direction: column; /* Ułóż jajko i licznik pionowo */
+  align-items: center; /* Wycentruj je w poziomie */
+  justify-content: center; /* Wycentruj je w pionie */
+  padding: 20px; /* Trochę odstępu od krawędzi */
 }
 
-.App-link {
-  color: #61dafb;
+/* Komponenty potomne (bez zmian w logice,
+  ale teraz są w kontekście .app-content) 
+*/
+
+/* Wyświetlacz licznika (pod jajkiem) */
+.click-counter {
+  margin-top: 20px; /* Odstęp od jajka */
+  font-size: 5rem; /* Duża czcionka licznika */
+  font-weight: bold;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Przycisk-jajko */
+.egg-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  /* Dodajemy fajny efekt przy najechaniu i kliknięciu */
+  transition: transform 0.1s ease-in-out;
+}
+
+.egg-button:hover {
+  transform: scale(1.02); /* Lekkie powiększenie przy najechaniu */
+}
+
+.egg-button:active {
+  transform: scale(0.98); /* Lekkie zmniejszenie przy kliknięciu */
+}
+
+/* Obrazek wewnątrz przycisku */
+.egg-button img {
+  width: 600px; /* Możesz dostosować domyślny rozmiar */
+  max-width: 100%; /* Aby nie wychodziło poza ekran na małych urządzeniach */
 }

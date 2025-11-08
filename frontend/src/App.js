@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'; 
 
-// Importujemy nasze nowe komponenty
 import ClickCounter from './components/ClickCounter';
 import Egg from './components/Egg';
 
+
 const API_URL = 'http://localhost:3001';
 
-// "Mądry" komponent - zarządza stanem i logiką API
 function App() {
   const [clickCount, setClickCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- Logika pobierania danych (bez zmian) ---
+  // --- Logika API (bez zmian) ---
   useEffect(() => {
     const fetchInitialClicks = async () => {
       try {
@@ -29,7 +28,6 @@ function App() {
     fetchInitialClicks();
   }, []);
 
-  // --- Logika wysyłania danych (bez zmian) ---
   const handleEggClick = async () => {
     try {
       const response = await fetch(`${API_URL}/api/click`, {
@@ -42,20 +40,21 @@ function App() {
     }
   };
 
-  // --- Renderowanie ---
-  // App.js tylko "dyryguje" innymi komponentami.
   return (
     <div className="App">
-      <header className="App-header">
-        <h4>Egg Clicker 🥚</h4>
-        
-        {/* Przekazujemy stan jako propsy */}
-        <ClickCounter count={clickCount} isLoading={isLoading} />
-        
-        {/* Przekazujemy funkcję i stan jako propsy */}
-        <Egg onClick={handleEggClick} isLoading={isLoading} />
-
+      
+      <header className="app-navbar">
+        <h1>🥚 Egg Clicker</h1>
       </header>
+
+      <main className="app-content">
+        
+        <Egg onClick={handleEggClick} isLoading={isLoading} />
+        
+        <ClickCounter count={clickCount} isLoading={isLoading} />
+
+      </main>
+
     </div>
   );
 }
