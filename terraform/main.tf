@@ -40,6 +40,8 @@ resource "aws_s3_bucket" "egg_clicker_files" {
 resource "aws_ecr_repository" "egg_clicker_backend" {
   name = "egg-clicker-backend" # Nazwa repozytorium w AWS
 
+  force_delete = true
+
   tags = {
     Name        = "EggClicker Backend Repo"
     Project     = "Egg Clicker"
@@ -51,6 +53,8 @@ resource "aws_ecr_repository" "egg_clicker_backend" {
 resource "aws_ecr_repository" "egg_clicker_frontend" {
   name = "egg-clicker-frontend" # Nazwa repozytorium w AWS
 
+  force_delete = true
+  
   tags = {
     Name        = "EggClicker Frontend Repo"
     Project     = "Egg Clicker"

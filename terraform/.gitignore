@@ -12,3 +12,6 @@ terraform.tfstate*
 # 3. Pliki logowania błędów
 crash.log
 
+# 4. Pliki zmiennych z wrażliwymi danymi
+terraform.tfvars
+
