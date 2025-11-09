@@ -78,3 +78,5 @@ resource "aws_route_table_association" "b" {
 # --- Dane pomocnicze ---
 # Pobiera informacje o regionie, w którym pracujemy
 data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}

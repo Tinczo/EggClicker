@@ -102,4 +102,9 @@ router.post('/upload-avatar', checkJwt, (req, res) => {
   });
 });
 
+router.get('/health', (req, res) => {
+  // Po prostu odpowiedz, że żyjesz
+  res.status(200).json({ status: 'ok' });
+});
+
 module.exports = router;

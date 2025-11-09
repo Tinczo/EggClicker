@@ -25,3 +25,15 @@ output "cognito_app_client_id" {
   description = "ID of the Cognito App Client"
   value       = aws_cognito_user_pool_client.app_client.id
 }
+
+# Pobieramy ID konta z danych AWS
+output "aws_account_id" {
+  description = "AWS Account ID"
+  value       = data.aws_caller_identity.current.account_id
+}
+
+# Pobieramy region z danych AWS
+output "aws_region" {
+  description = "AWS Region"
+  value       = data.aws_region.current.name
+}

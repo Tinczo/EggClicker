@@ -60,4 +60,4 @@ resource "aws_ecr_repository" "egg_clicker_frontend" {
     Project     = "Egg Clicker"
     ManagedBy   = "Terraform"
   }
-}   
+}

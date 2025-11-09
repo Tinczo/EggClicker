@@ -42,7 +42,7 @@ resource "aws_lb_target_group" "backend" {
 
   # Sprawdzanie "zdrowia" - czy backend odpowiada
   health_check {
-    path = "/api/clicks" # Używamy jednego z naszych endpointów GET
+    path = "/api/health" # Używamy jednego z naszych endpointów GET
   }
 }
 

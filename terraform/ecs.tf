@@ -43,6 +43,26 @@ resource "aws_ecs_task_definition" "backend" {
         }
       ]
 
+      environment = [
+        {
+          name  = "AWS_REGION",
+          value = var.aws_region
+        },
+        {
+          name  = "COGNITO_USER_POOL_ID",
+          value = aws_cognito_user_pool.egg_clicker_pool.id
+        },
+        {
+          name  = "COGNITO_APP_CLIENT_ID",
+          value = aws_cognito_user_pool_client.app_client.id
+        },
+        {
+          # Dodajmy też NODE_ENV dla pewności
+          name  = "NODE_ENV",
+          value = "production"
+        }
+      ]
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
