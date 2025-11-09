@@ -5,7 +5,7 @@ import ClickCounter from './components/ClickCounter';
 import Egg from './components/Egg';
 
 
-const API_URL = 'http://localhost:3001';
+const API_URL = '';
 
 function App() {
   const [clickCount, setClickCount] = useState(0);

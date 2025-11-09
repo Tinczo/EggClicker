@@ -1,0 +1,6 @@
+# Ignoruj cały folder node_modules, Docker sam je zainstaluje
+node_modules
+
+# Pliki systemowe i logi
+.DS_Store
+npm-debug.log

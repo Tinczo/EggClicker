@@ -1,0 +1,8 @@
+# Ignorujmy zależności lokalne
+node_modules
+
+# Ignoruj folder 'build', ponieważ Docker sam go stworzy
+build
+
+# Pliki systemowe
+.DS_Store
