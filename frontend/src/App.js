@@ -4,6 +4,7 @@ import './App.css';
 import ClickCounter from './components/ClickCounter';
 import Egg from './components/Egg';
 
+import { Auth } from 'aws-amplify';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 
@@ -16,26 +17,45 @@ function App({ signOut, user }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // --- Logika API (bez zmian) ---
-  useEffect(() => {
-    const fetchInitialClicks = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`${API_URL}/api/clicks`);
-        const data = await response.json();
-        setClickCount(data.count);
-      } catch (error) {
-        console.error('Błąd podczas pobierania kliknięć:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchInitialClicks();
-  }, []);
+// ...
+useEffect(() => {
+  const fetchInitialClicks = async () => {
+    try {
+      setIsLoading(true);
+
+      // --- POCZĄTEK ZMIAN ---
+      // Pobieramy sesję zalogowanego użytkownika
+      const session = await Auth.currentSession();
+      const token = session.getIdToken().getJwtToken();
+
+      const response = await fetch(`${API_URL}/api/clicks`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      setClickCount(data.count);
+    } catch (error) {
+      console.error('Błąd podczas pobierania kliknięć:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  fetchInitialClicks();
+}, []);
 
   const handleEggClick = async () => {
     try {
+      const session = await Auth.currentSession();
+      const token = session.getIdToken().getJwtToken();
+
       const response = await fetch(`${API_URL}/api/click`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
       });
       const data = await response.json();
       setClickCount(data.count);

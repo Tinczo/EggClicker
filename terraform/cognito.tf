@@ -18,7 +18,7 @@ resource "aws_cognito_user_pool" "egg_clicker_pool" {
   # Konfiguracja haseł
   password_policy {
     minimum_length    = 6
-    require_lowercase = true
+    require_lowercase = false
     require_uppercase = false
     require_numbers   = true
     require_symbols   = false # Uprośćmy to trochę

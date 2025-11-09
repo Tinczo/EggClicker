@@ -8,6 +8,8 @@ services:
     environment:
       NODE_ENV: production
       AWS_REGION: ${AWS_REGION}
+      COGNITO_USER_POOL_ID: ${REACT_APP_COGNITO_USER_POOL_ID}
+      COGNITO_APP_CLIENT_ID: ${REACT_APP_COGNITO_APP_CLIENT_ID}
 
   frontend:
     build: 
