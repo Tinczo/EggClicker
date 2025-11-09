@@ -1,0 +1,14 @@
+# 1. Pliki stanu (STATE) - KRYTYCZNE!
+# Zawierają one aktualny stan Twojej infrastruktury,
+# a CZASAMI MOGĄ ZAWIERAĆ WRAŻLIWE DANE (np. hasła do bazy danych).
+# Nigdy nie powinny trafić do publicznego repozytorium.
+terraform.tfstate*
+
+# 2. Folder roboczy Terraform
+# Zawiera pobrane wtyczki (providers) i cache.
+# Jest generowany automatycznie przez `terraform init`.
+.terraform/
+
+# 3. Pliki logowania błędów
+crash.log
+

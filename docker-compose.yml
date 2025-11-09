@@ -1,23 +1,18 @@
 services:
-  # Definicja naszego kontenera backendu
   backend:
-    build: ./backend  # Ścieżka do folderu z Dockerfile backendu
+    build: ./backend
     container_name: egg-clicker-backend
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/egg-clicker-backend:latest
     ports:
-      # Mapujemy port 3001 na zewnątrz (na Twoim kompie)
-      # do portu 3001 wewnątrz kontenera
       - "3001:3001"
     environment:
-      # Możemy tu dodawać zmienne środowiskowe, przyda się później
       NODE_ENV: production
 
-  # Definicja naszego kontenera frontendu
   frontend:
-    build: ./frontend # Ścieżka do folderu z Dockerfile frontendu
+    build: ./frontend
     container_name: egg-clicker-frontend
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/egg-clicker-frontend:latest
     ports:
-      # Mapujemy port 8080 na zewnątrz (Twój komputer)
-      # do portu 80 wewnątrz kontenera (tam działa Nginx)
       - "8080:80"
     depends_on:
-      - backend     # Mówimy Compose, aby uruchomił backend PRZED frontendem
+      - backend
