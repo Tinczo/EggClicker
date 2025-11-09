@@ -26,9 +26,15 @@ body, html {
 */
 .app-navbar {
   width: 100%;
-  padding: 10px 0; /* Trochę oddechu góra/dół */
+  padding: 10px 25px;
   background-color: #20232a; /* Lekko inny odcień tła */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Mały cień */
+
+  display: flex;
+  justify-content: space-between; /* Rozsuwa elementy */
+  align-items: center; /* Wyrównuje w pionie */
+  box-sizing: border-box; /* Ważne, aby padding nie psuł szerokości */
+
 }
 
 .app-navbar h1 {
@@ -84,4 +90,32 @@ body, html {
 .egg-button img {
   width: 600px; /* Możesz dostosować domyślny rozmiar */
   max-width: 100%; /* Aby nie wychodziło poza ekran na małych urządzeniach */
+}
+
+/* DODAJ TE NOWE STYLE */
+.user-info {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.user-info span {
+  margin-right: 15px; /* Odstęp między tekstem a przyciskiem */
+  color: #cccccc; /* Lepszy kolor dla powitania */
+}
+
+.sign-out-button {
+  background: none;
+  border: 1px solid #bd93f7; /* Kolor akcentu (Reacta) */
+  color: #bd93f7;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sign-out-button:hover {
+  background-color: #bd93f7;
+  color: #20232a; /* Ciemny kolor tła przy najechaniu */
 }

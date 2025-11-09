@@ -10,7 +10,12 @@ services:
       AWS_REGION: ${AWS_REGION}
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        - REACT_APP_COGNITO_USER_POOL_ID=${REACT_APP_COGNITO_USER_POOL_ID}
+        - REACT_APP_COGNITO_APP_CLIENT_ID=${REACT_APP_COGNITO_APP_CLIENT_ID}
+        - REACT_APP_AWS_REGION=${REACT_APP_AWS_REGION}
     container_name: egg-clicker-frontend
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/egg-clicker-frontend:latest
     ports:

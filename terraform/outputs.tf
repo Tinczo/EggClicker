@@ -15,3 +15,13 @@ output "alb_dns_name" {
   description = "Public DNS name of the Application Load Balancer"
   value       = aws_lb.main.dns_name
 }
+
+output "cognito_user_pool_id" {
+  description = "ID of the Cognito User Pool"
+  value       = aws_cognito_user_pool.egg_clicker_pool.id
+}
+
+output "cognito_app_client_id" {
+  description = "ID of the Cognito App Client"
+  value       = aws_cognito_user_pool_client.app_client.id
+}
