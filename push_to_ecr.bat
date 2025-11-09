@@ -48,10 +48,17 @@ if %errorlevel% neq 0 (
     echo "BLAD: Wypychanie obrazow nie powiodlo sie!"
     goto :eof
 )
+echo "Wypychanie zakonczone pomyslnie."
+echo.
 
-echo ""
+REM --- DODAJ TE LINIE ---
+echo "--- Wymuszanie nowego wdrozenia w AWS Fargate... ---"
+aws ecs update-service --cluster egg-clicker-cluster --service egg-clicker-backend-service --force-new-deployment
+aws ecs update-service --cluster egg-clicker-cluster --service egg-clicker-frontend-service --force-new-deployment
+
+echo.
 echo "=========================================================="
-echo "  SUKCES! Nowe wersje obrazow sa w ECR."
+echo "  SUKCES! Nowe wersje sa w ECR i Fargate sie aktualizuje."
 echo "=========================================================="
 
 endlocal

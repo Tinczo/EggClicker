@@ -51,8 +51,15 @@ echo "--- Wypychanie obrazow do ECR (docker-compose push)... ---"
 # docker-compose jest na tyle mądry, że 'push' wypchnie obrazy
 # zdefiniowane w sekcji 'image:'
 docker-compose push
+echo "Wypychanie zakonczone pomyslnie."
+echo ""
+
+# --- DODAJ TE LINIE ---
+echo "--- Wymuszanie nowego wdrozenia w AWS Fargate... ---"
+aws ecs update-service --cluster egg-clicker-cluster --service egg-clicker-backend-service --force-new-deployment
+aws ecs update-service --cluster egg-clicker-cluster --service egg-clicker-frontend-service --force-new-deployment
 
 echo ""
 echo "=========================================================="
-echo "  SUKCES! Nowe wersje obrazow sa w ECR."
+echo "  SUKCES! Nowe wersje sa w ECR i Fargate sie aktualizuje."
 echo "=========================================================="

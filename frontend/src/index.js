@@ -6,7 +6,6 @@ import reportWebVitals from './reportWebVitals';
 
 import { Amplify } from 'aws-amplify';
 import config from './amplify-config';
-console.log("KONFIGURACJA PRZEKAZANA DO AMPLIFY:", config);
 Amplify.configure(config);
 
 
