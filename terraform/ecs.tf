@@ -23,6 +23,10 @@ resource "aws_ecs_task_definition" "backend" {
   # Używamy Twojej roli `LabRole` jako roli wykonawczej
   execution_role_arn = var.lab_role_arn
 
+  # --- DODANA LINIA ---
+  # "Kapelusz Nr 2" (dla AWS SDK wewnątrz kontenera)
+  task_role_arn      = var.lab_role_arn
+
   # Definicja naszego kontenera
   container_definitions = jsonencode([
     {
@@ -63,6 +67,10 @@ resource "aws_ecs_task_definition" "frontend" {
   # Również używamy Twojej `LabRole`
   execution_role_arn       = var.lab_role_arn
 
+  # --- DODANA LINIA ---
+  # "Kapelusz Nr 2" (dla AWS SDK wewnątrz kontenera)
+  task_role_arn      = var.lab_role_arn
+
   container_definitions = jsonencode([
     {
       name  = "egg-clicker-frontend-container"
@@ -101,6 +109,10 @@ resource "aws_ecs_service" "backend" {
   desired_count   = 1       # Chcemy 1 działającą kopię
   launch_type     = "FARGATE"
 
+  # --- DODANA LINIA ---
+  # To rozwiązuje problem "słabej aktualizacji"
+  force_new_deployment = true
+
   # Konfiguracja sieciowa
   network_configuration {
     subnets         = [aws_subnet.public_a.id, aws_subnet.public_b.id] # Gdzie ma działać
@@ -126,6 +138,10 @@ resource "aws_ecs_service" "frontend" {
   task_definition = aws_ecs_task_definition.frontend.arn
   desired_count   = 1
   launch_type     = "FARGATE"
+
+  # --- DODANA LINIA ---
+  # To rozwiązuje problem "słabej aktualizacji"
+  force_new_deployment = true
 
   network_configuration {
     subnets         = [aws_subnet.public_a.id, aws_subnet.public_b.id]
