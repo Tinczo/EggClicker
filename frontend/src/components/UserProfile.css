@@ -1,0 +1,91 @@
+/* Plik: frontend/src/components/UserProfile.css */
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.profile-form label {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #cccccc;
+}
+
+.profile-form input {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background-color: #3a3f4b;
+  color: white;
+  font-size: 1rem;
+}
+
+.profile-form input[readOnly] {
+  background-color: #282c34;
+  color: #aaa;
+}
+
+
+
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.profile-save-button, .profile-back-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.profile-save-button {
+  background-color: #bd93f7;
+  color: #20232a;
+}
+
+.profile-save-button:hover {
+  background-color: #d4baf9;
+}
+
+.profile-back-button {
+  background-color: #555;
+  color: white;
+}
+
+.profile-back-button:hover {
+  background-color: #777;
+}
+
+
+.profile-divider {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 25px 0;
+}
+
+.profile-message {
+  font-size: 0.9rem;
+  color: #61dafb; /* Domyślnie niebieski dla sukcesu */
+  margin-bottom: 30px;
+}

@@ -100,7 +100,6 @@ body, html {
 }
 
 .user-info span {
-  margin-right: 15px; /* Odstęp między tekstem a przyciskiem */
   color: #cccccc; /* Lepszy kolor dla powitania */
 }
 
@@ -118,4 +117,28 @@ body, html {
 .sign-out-button:hover {
   background-color: #bd93f7;
   color: #20232a; /* Ciemny kolor tła przy najechaniu */
+}
+
+/* Plik: frontend/src/App.css (dodaj na końcu) */
+
+.profile-button {
+  background: none;
+  border: none;
+  color: #61dafb;
+  font-size: 1.5rem; /* Powiększa emoji */
+  cursor: pointer;
+  margin: 0 10px; /* Odstęp od nazwy i przycisku wylogowania */
+  padding: 0 5px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  text-decoration: none;
+}
+
+.profile-button:hover {
+  transform: scale(1.15);
+}
+
+.header-logo-link {
+  color: inherit; /* Dziedziczy biały kolor tekstu */
+  text-decoration: none; /* Usuwa podkreślenie */
 }

@@ -3,6 +3,7 @@ import './App.css';
 
 import ClickCounter from './components/ClickCounter';
 import Egg from './components/Egg';
+import UserProfile from './components/UserProfile';
 
 import { Auth } from 'aws-amplify';
 import { withAuthenticator } from '@aws-amplify/ui-react';
@@ -11,13 +12,15 @@ import '@aws-amplify/ui-react/styles.css';
 
 const API_URL = '';
 
+import { Routes, Route, Link } from 'react-router-dom';
+
+
 function App({ signOut, user }) { 
 
   const [clickCount, setClickCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- Logika API (bez zmian) ---
-// ...
+
 useEffect(() => {
   const fetchInitialClicks = async () => {
     try {
@@ -45,6 +48,18 @@ useEffect(() => {
   fetchInitialClicks();
 }, []);
 
+const playJajcoSound = () => {
+    const audio = new Audio('/jajo.mp3');
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.log("Blad odtwarzania dzwieku (byc moze polityka autoplay):", error);
+      });
+    }
+  };
+
   const handleEggClick = async () => {
     try {
       const session = await Auth.currentSession();
@@ -64,14 +79,23 @@ useEffect(() => {
     }
   };
 
-  return (
+return (
     <div className="App">
-      
       <header className="app-navbar">
-        <h1>🥚 Egg Clicker</h1>
+        <Link to="/" className="header-logo-link" onClick={playJajcoSound}>
+          <h1>🥚 Egg Clicker</h1>
+        </Link>
         
         <div className="user-info">
           <span>Witaj, {user.username}!</span>
+          
+          <Link 
+            to="/profile"
+            className="profile-button" 
+            title="Przejdź do profilu"
+          >
+            👤
+          </Link>
           
           <button onClick={signOut} className="sign-out-button">
             Wyloguj się
@@ -79,15 +103,23 @@ useEffect(() => {
         </div>
       </header>
       
-
       <main className="app-content">
         
-        <Egg onClick={handleEggClick} isLoading={isLoading} />
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Egg onClick={handleEggClick} isLoading={isLoading} />
+              <ClickCounter count={clickCount} isLoading={isLoading} />
+            </>
+          } />
+          
+          <Route path="/profile" element={
+            <UserProfile />
+          } />
+
+        </Routes>
         
-        <ClickCounter count={clickCount} isLoading={isLoading} />
-
       </main>
-
     </div>
   );
 }

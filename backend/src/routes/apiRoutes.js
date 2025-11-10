@@ -89,20 +89,25 @@ router.post('/click', checkJwt, async (req, res) => {
 
 
 router.get('/user-profile', checkJwt, (req, res) => {
-  // Teraz też możemy tu użyć ID użytkownika!
+
   const userId = req.auth.sub;
-  console.log(`GET /api/user-profile (stub) dla ${userId}`);
+  const username = req.auth['cognito:username'];
+  const email = req.auth.email;
+
+  console.log(`GET /api/user-profile dla ${userId} (${username})`);
+
   res.json({
-    username: userId, // Zwróćmy prawdziwe ID
-    email: req.auth.email, // Middleware express-jwt (teoretycznie) też to udostępnia
-    user_clicks: "TODO: Pobierz z DynamoDB",
-    join_date: '2025-01-01',
+    username: username,
+    email: email
   });
 });
 
 router.post('/user-profile', checkJwt, (req, res) => {
   const userId = req.auth.sub;
-  console.log(`POST /api/user-profile (stub) dla ${userId}`);
+  console.log(`POST /api/user-profile (stub) dla ${userId} - nic nie robie`);
+
+  // Udajemy sukces, ale nic nie robimy.
+  // W przyszłości możemy tu zaimplementować zmianę zdjęcia.
   res.json({ status: 'success', message: 'Profil zaktualizowany!' });
 });
 
