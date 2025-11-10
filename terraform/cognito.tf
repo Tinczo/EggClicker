@@ -1,7 +1,7 @@
 resource "aws_cognito_user_pool" "egg_clicker_pool" {
   name = "EggClickerUserPool"
 
-  username_attributes = ["email"]
+  alias_attributes = ["email"]
   auto_verified_attributes = ["email"]
 
   email_configuration {
@@ -12,7 +12,7 @@ resource "aws_cognito_user_pool" "egg_clicker_pool" {
     name                     = "email"
     required                 = true
     attribute_data_type      = "String"
-    mutable                  = false
+    mutable                  = true
   }
 
   # Konfiguracja haseł

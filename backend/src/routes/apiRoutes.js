@@ -42,38 +42,51 @@ router.get('/clicks', checkJwt, async (req, res) => {
 });
 
 // 2. POST /click - Rejestruje (atomowo) nowe kliknięcie w bazie
+// Plik: backend/src/routes/apiRoutes.js
+
+
+// 2. POST /click - WERSJA OSTATECZNA (z poprawną nazwą użytkownika)
 router.post('/click', checkJwt, async (req, res) => {
+  // "Ochroniarz" (checkJwt) dał nam ID oraz nazwę użytkownika z tokenu
   const userId = req.auth.sub;
+  
+  // --- TUTAJ JEST POPRAWKA ---
+  // Używamy notacji z nawiasami, bo nazwa pola zawiera ":"
+  const username = req.auth['cognito:username']; 
+
+  // Dodatkowe zabezpieczenie: sprawdź, czy username istnieje
+  if (!username) {
+    console.error('Brak nazwy uzytkownika (cognito:username) w tokenie:', req.auth);
+    return res.status(500).json({ error: 'Blad tokenu: brak nazwy uzytkownika' });
+  }
 
   const params = {
     TableName: tableName,
     Key: {
-      ItemID: userId, // Aktualizujemy wiersz "global_clicks"
+      ItemID: userId, // Klucz główny
     },
-    // To jest "magia" DynamoDB:
-    // Atomowo "dodaj 1" do atrybutu "clickCount".
-    // Jeśli "clickCount" nie istnieje, ustaw go najpierw na 0, a potem dodaj 1.
-    UpdateExpression: 'SET clickCount = if_not_exists(clickCount, :start) + :inc',
+    // Przywracamy naszą pełną logikę zapisu
+    UpdateExpression: 'SET clickCount = if_not_exists(clickCount, :start) + :inc, username = :u',
     ExpressionAttributeValues: {
-      ':inc': 1,   // Wartość do dodania
-      ':start': 0, // Wartość startowa, jeśli nie istnieje
+      ':inc': 1,
+      ':start': 0,
+      ':u': username, // Przekazujemy poprawną nazwę użytkownika do zapisu
     },
-    ReturnValues: 'UPDATED_NEW', // Zwróć nam nową wartość po aktualizacji
+    ReturnValues: 'UPDATED_NEW', // Zwróć zaktualizowane wartości
   };
 
   try {
     const data = await docClient.update(params).promise();
     const newCount = data.Attributes.clickCount;
     
-    console.log(`POST /api/click dla ${userId} - Nowa liczba w DynamoDB: ${newCount}`);
-    res.json({ count: newCount });
+    console.log(`POST /api/click dla ${userId} (${username}) - Nowa liczba w DynamoDB: ${newCount}`);
+    res.json({ count: newCount }); 
   } catch (err) {
     console.error(`Błąd zapisu do DynamoDB dla ${userId}:`, err);
     res.status(500).json({ error: 'Nie można zapisać kliknięcia' });
   }
 });
 
-// --- Pozostałe Stuby (bez zmian) ---
 
 router.get('/user-profile', checkJwt, (req, res) => {
   // Teraz też możemy tu użyć ID użytkownika!

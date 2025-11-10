@@ -71,7 +71,7 @@ useEffect(() => {
         <h1>🥚 Egg Clicker</h1>
         
         <div className="user-info">
-          <span>Witaj, {user.attributes.email}!</span>
+          <span>Witaj, {user.username}!</span>
           
           <button onClick={signOut} className="sign-out-button">
             Wyloguj się
@@ -95,13 +95,13 @@ useEffect(() => {
 export default withAuthenticator(App, {
   // 1. Jakie pola ma akceptować formularz LOGOWANIA
   loginMechanisms: [
-    'email', // Tylko e-mail
+    'username', // Pozwol logowac sie nazwa
+    'email',    // ORAZ pozwol logowac sie mailem
   ],
   // 2. Jakie pola ma pokazywać formularz REJESTRACJI
   // (Amplify jest na tyle mądry, że sam doda pola "Email", "Password", "Confirm Password")
   // Nie musimy już prosić o "email", bo jest on teraz głównym loginem.
   signUpAttributes: [
-    // Możemy tu dodać np. 'name' (imię), jeśli byśmy je mieli w schemacie,
-    // ale na razie zostawmy puste.
+    'email', // Popros o email przy rejestracji
   ],
 });
