@@ -34,7 +34,7 @@ echo "Logowanie do ECR zakonczone pomyslnie."
 
 REM --- 3. Budowanie obrazow ---
 echo "Budowanie nowych obrazow (docker-compose build)..."
-docker-compose build --quiet
+docker-compose build
 if %errorlevel% neq 0 (
     echo "BLAD: Budowanie obrazow nie powiodlo sie!"
     goto :eof

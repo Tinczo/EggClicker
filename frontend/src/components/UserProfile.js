@@ -1,79 +1,36 @@
-// Plik: frontend/src/components/UserProfile.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; 
 import './UserProfile.css';
 import { Link } from 'react-router-dom';
-import { Auth } from 'aws-amplify'; // Musimy pobrać token i zmienić hasło
+import { Auth } from 'aws-amplify';
 
-function UserProfile() {
-  // Stany do zarządzania danymi
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+
+function UserProfile({ user }) {
   
-  // --- NOWE STANY DLA ZMIANY HASŁA ---
+  // Stany TYLKO dla zmiany hasła
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [message, setMessage] = useState(''); // Do pokazywania komunikatów
+  const [message, setMessage] = useState('');
 
-  // Wczytywanie danych użytkownika (to już masz i działa)
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setIsLoading(true);
-      try {
-        const session = await Auth.currentSession();
-        const token = session.getIdToken().getJwtToken();
-
-        const response = await fetch('/api/user-profile', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) throw new Error('Nie udało się pobrać danych');
-
-        const data = await response.json();
-        setUsername(data.username);
-        setEmail(data.email);
-
-      } catch (error) {
-        console.error("Błąd wczytywania profilu:", error);
-        setMessage(`Błąd wczytywania danych: ${error.message}`);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUserData();
-  }, []);
-
-  // --- NOWA LOGIKA PRZYCISKU "ZAPISZ ZMIANY" ---
+  // Logika zmiany hasła (zostaje bez zmian)
   const handlePasswordChange = async () => {
-    // Sprawdzamy, czy użytkownik w ogóle chce zmienić hasło
     if (!oldPassword || !newPassword) {
       setMessage('Proszę wypełnić oba pola hasła, aby je zmienić.');
       return;
     }
-    
     setMessage('Zmieniam hasło...');
     try {
-      // 1. Pobierz obiekt aktualnego użytkownika z Amplify
       const currentUser = await Auth.currentAuthenticatedUser();
-      
-      // 2. Wywołaj wbudowaną funkcję Amplify do zmiany hasła
       await Auth.changePassword(currentUser, oldPassword, newPassword);
-      
-      // 3. Sukces!
       setMessage('Hasło zostało pomyślnie zmienione!');
       setOldPassword('');
       setNewPassword('');
-
     } catch (err) {
       console.error('Błąd zmiany hasła:', err);
       setMessage(`Błąd: ${err.message || 'Niepoprawne stare hasło?'}`);
     }
   };
 
-  if (isLoading) {
-    return <div className="profile-container"><h2>Ładowanie profilu...</h2></div>;
-  }
-
+  // Nie ma już "isLoading", bo dane mamy od razu
   return (
     <div className="profile-container">
       <h2>Panel Użytkownika</h2>
@@ -83,16 +40,16 @@ function UserProfile() {
         <input 
           id="username" 
           type="text" 
-          value={username} 
-          readOnly // --- USTAWIAMY `readOnly` ---
+          value={user.username} // Czytamy prosto z propa
+          readOnly 
         />
         
         <label htmlFor="email">Email:</label>
         <input 
           id="email" 
           type="email" 
-          value={email} 
-          readOnly // --- USTAWIAMY `readOnly` ---
+          value={user.attributes.email} // Czytamy atrybut prosto z propa
+          readOnly 
         />
 
         {/* --- DODAJ TĘ SEKCJĘ ZMIANY HASŁA --- */}

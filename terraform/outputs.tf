@@ -37,3 +37,8 @@ output "aws_region" {
   description = "AWS Region"
   value       = data.aws_region.current.name
 }
+
+output "s3_bucket_name" {
+  description = "Nazwa bucketa S3 na pliki multimedialne"
+  value       = aws_s3_bucket.egg_clicker_files.bucket
+}

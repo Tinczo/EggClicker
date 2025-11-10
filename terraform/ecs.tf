@@ -60,6 +60,10 @@ resource "aws_ecs_task_definition" "backend" {
           # Dodajmy też NODE_ENV dla pewności
           name  = "NODE_ENV",
           value = "production"
+        },
+        {
+          name  = "S3_BUCKET_NAME",
+          value = aws_s3_bucket.egg_clicker_files.bucket
         }
       ]
 

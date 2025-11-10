@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const AWS = require('aws-sdk'); // Importujemy AWS SDK
 const checkJwt = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
 
 // --- Konfiguracja AWS ---
 // AWS SDK automatycznie wykryje poświadczenia (rolę IAM),
@@ -11,9 +13,25 @@ AWS.config.update({ region: process.env.AWS_REGION });
 
 // Tworzymy "klienta" do komunikacji z DynamoDB
 const docClient = new AWS.DynamoDB.DocumentClient();
-const tableName = 'EggClickerData'; // Nazwa tabeli z naszego Terraform
+const s3 = new AWS.S3();
 
-// --- Implementacja endpointów (wersja z DynamoDB) ---
+const tableName = 'EggClickerData'; // Nazwa tabeli z naszego Terraform
+const s3BucketName = process.env.S3_BUCKET_NAME;
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error("Error: Akceptowane sa tylko pliki obrazow (jpeg, png, gif)!"));
+  }
+}).single('avatar');
 
 // 1. GET /clicks - Pobiera aktualną liczbę kliknięć z bazy
 router.get('/clicks', checkJwt, async (req, res) => {
@@ -87,36 +105,65 @@ router.post('/click', checkJwt, async (req, res) => {
   }
 });
 
+// Plik: backend/src/routes/apiRoutes.js
 
-router.get('/user-profile', checkJwt, (req, res) => {
-
-  const userId = req.auth.sub;
-  const username = req.auth['cognito:username'];
-  const email = req.auth.email;
-
-  console.log(`GET /api/user-profile dla ${userId} (${username})`);
-
-  res.json({
-    username: username,
-    email: email
-  });
-});
-
-router.post('/user-profile', checkJwt, (req, res) => {
-  const userId = req.auth.sub;
-  console.log(`POST /api/user-profile (stub) dla ${userId} - nic nie robie`);
-
-  // Udajemy sukces, ale nic nie robimy.
-  // W przyszłości możemy tu zaimplementować zmianę zdjęcia.
-  res.json({ status: 'success', message: 'Profil zaktualizowany!' });
-});
+// ... (wszystkie inne endpointy: /health, /clicks, /click, /user-profile) ...
 
 router.post('/upload-avatar', checkJwt, (req, res) => {
-  const userId = req.auth.sub;
-  console.log(`POST /api/upload-avatar (stub) dla ${userId}`);
-  res.json({
-    status: 'success',
-    fileUrl: 'https.s3.example-aws-region.amazonaws.com/twoj-bucket/avatars/test-user-avatar.jpg',
+
+  // 1. Użyj middleware 'upload', aby przetworzyć plik
+  upload(req, res, async (err) => {
+    if (err) {
+      // Obsłuż błędy Multera (np. zły typ pliku, plik za duży)
+      console.error("Blad Multera:", err.message);
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Nie wybrano pliku' });
+    }
+
+    const userId = req.auth.sub;
+    const fileExtension = path.extname(req.file.originalname).toLowerCase();
+    const s3Key = `avatars/${userId}${fileExtension}`;
+
+    console.log(`Przesylanie pliku do S3 dla ${userId} jako ${s3Key}...`);
+
+    // 3. Parametry wysyłania do S3
+    const s3Params = {
+      Bucket: s3BucketName,
+      Key: s3Key,
+      Body: req.file.buffer, // Plik z pamięci (z Multera)
+      ContentType: req.file.mimetype,
+      ACL: 'public-read' // Ustawiamy plik jako publicznie czytelny
+    };
+
+    try {
+      const s3Data = await s3.upload(s3Params).promise();
+      const avatarUrl = s3Data.Location;
+      
+      console.log(`Plik zapisany w S3: ${avatarUrl}`);
+
+      // 5. Zapisanie URL-a w DynamoDB
+      const dynamoParams = {
+        TableName: tableName,
+        Key: { ItemID: userId },
+        UpdateExpression: 'SET avatarUrl = :url',
+        ExpressionAttributeValues: {
+          ':url': avatarUrl
+        }
+      };
+      await docClient.update(dynamoParams).promise();
+
+      console.log(`URL awatara zapisany w DynamoDB dla ${userId}`);
+
+      // 6. Odesłanie sukcesu do frontendu
+      res.json({ avatarUrl: avatarUrl });
+
+    } catch (s3Err) {
+      console.error("Blad podczas wysylania do S3 lub zapisu do DynamoDB:", s3Err);
+      res.status(500).json({ error: 'Blad serwera podczas przetwarzania pliku.' });
+    }
   });
 });
 

@@ -27,6 +27,7 @@ AWS_ACCOUNT_ID=$(echo $TF_OUTPUT | jq -r .aws_account_id.value)
 AWS_REGION=$(echo $TF_OUTPUT | jq -r .aws_region.value)
 COGNITO_POOL_ID=$(echo $TF_OUTPUT | jq -r .cognito_user_pool_id.value)
 COGNITO_CLIENT_ID=$(echo $TF_OUTPUT | jq -r .cognito_app_client_id.value)
+S3_BUCKET_NAME=$(echo $TF_OUTPUT | jq -r .s3_bucket_name.value)
 
 # Wróć do głównego folderu
 cd ..
@@ -36,6 +37,7 @@ echo "Generowanie plików .env..."
 cat > .env << EOL
 AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID}
 AWS_REGION=${AWS_REGION}
+S3_BUCKET_NAME=${S3_BUCKET_NAME}
 
 REACT_APP_AWS_REGION=${AWS_REGION}
 REACT_APP_COGNITO_USER_POOL_ID=${COGNITO_POOL_ID}
@@ -56,6 +58,7 @@ cat > backend/.env << EOL
 AWS_REGION=${AWS_REGION}
 COGNITO_USER_POOL_ID=${COGNITO_POOL_ID}
 COGNITO_APP_CLIENT_ID=${COGNITO_CLIENT_ID}
+S3_BUCKET_NAME=${S3_BUCKET_NAME}
 EOL
 echo "Stworzono: ./backend/.env"
 

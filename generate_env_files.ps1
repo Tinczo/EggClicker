@@ -26,7 +26,7 @@ try {
     $AWS_REGION = $tfOutput.aws_region.value
     $COGNITO_POOL_ID = $tfOutput.cognito_user_pool_id.value
     $COGNITO_CLIENT_ID = $tfOutput.cognito_app_client_id.value
-
+    $S3_BUCKET_NAME = $tfOutput.s3_bucket_name.value
     # Wróć do głównego folderu
     Set-Location -Path ".."
     Write-Host "Generating .env files..."
@@ -36,10 +36,12 @@ try {
     $rootEnvContent = @"
 AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
 AWS_REGION=$AWS_REGION
+S3_BUCKET_NAME=$S3_BUCKET_NAME
 
 REACT_APP_AWS_REGION=$AWS_REGION
 REACT_APP_COGNITO_USER_POOL_ID=$COGNITO_POOL_ID
 REACT_APP_COGNITO_APP_CLIENT_ID=$COGNITO_CLIENT_ID
+
 "@
     Set-Content -Path ".env" -Value $rootEnvContent
     Write-Host "Created: ./.env"
@@ -60,6 +62,7 @@ REACT_APP_COGNITO_APP_CLIENT_ID=$COGNITO_CLIENT_ID
 AWS_REGION=$AWS_REGION
 COGNITO_USER_POOL_ID=$COGNITO_POOL_ID
 COGNITO_APP_CLIENT_ID=$COGNITO_CLIENT_ID
+S3_BUCKET_NAME=$S3_BUCKET_NAME
 "@
     Set-Content -Path "backend/.env" -Value $backendEnvContent
     Write-Host "Created: ./backend/.env"

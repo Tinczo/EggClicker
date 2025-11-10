@@ -1,3 +1,4 @@
+import { Routes, Route, Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './App.css'; 
 
@@ -12,7 +13,6 @@ import '@aws-amplify/ui-react/styles.css';
 
 const API_URL = '';
 
-import { Routes, Route, Link } from 'react-router-dom';
 
 
 function App({ signOut, user }) { 
@@ -114,7 +114,7 @@ return (
           } />
           
           <Route path="/profile" element={
-            <UserProfile />
+            <UserProfile user={user} />
           } />
 
         </Routes>
