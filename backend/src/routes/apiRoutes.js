@@ -105,9 +105,29 @@ router.post('/click', checkJwt, async (req, res) => {
   }
 });
 
-// Plik: backend/src/routes/apiRoutes.js
+router.get('/avatar-url', checkJwt, async (req, res) => {
+  const userId = req.auth.sub;
 
-// ... (wszystkie inne endpointy: /health, /clicks, /click, /user-profile) ...
+  const params = {
+    TableName: tableName,
+    Key: {
+      ItemID: userId,
+    },
+    ProjectionExpression: 'avatarUrl', 
+  };
+
+  try {
+    const data = await docClient.get(params).promise();
+
+    const avatarUrl = data.Item ? data.Item.avatarUrl : null;
+    console.log(`GET /api/avatar-url dla ${userId} - Zwrócono: ${avatarUrl}`);
+    res.json({ avatarUrl: avatarUrl });
+
+  } catch (err) {
+    console.error(`Błąd odczytu avatarUrl z DynamoDB dla ${userId}:`, err);
+    res.status(500).json({ error: 'Nie można pobrać danych' });
+  }
+});
 
 router.post('/upload-avatar', checkJwt, (req, res) => {
 
@@ -135,7 +155,6 @@ router.post('/upload-avatar', checkJwt, (req, res) => {
       Key: s3Key,
       Body: req.file.buffer, // Plik z pamięci (z Multera)
       ContentType: req.file.mimetype,
-      ACL: 'public-read' // Ustawiamy plik jako publicznie czytelny
     };
 
     try {

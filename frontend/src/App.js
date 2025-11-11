@@ -20,14 +20,15 @@ function App({ signOut, user }) {
   const [clickCount, setClickCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [avatarUrl, setAvatarUrl] = useState(null); // URL awatara
+  const [avatarLoading, setAvatarLoading] = useState(true); // Status ładowania awatara
+
 
 useEffect(() => {
   const fetchInitialClicks = async () => {
     try {
       setIsLoading(true);
 
-      // --- POCZĄTEK ZMIAN ---
-      // Pobieramy sesję zalogowanego użytkownika
       const session = await Auth.currentSession();
       const token = session.getIdToken().getJwtToken();
 
@@ -47,6 +48,29 @@ useEffect(() => {
   };
   fetchInitialClicks();
 }, []);
+
+useEffect(() => {
+    const fetchAvatarUrl = async () => {
+      try {
+        const session = await Auth.currentSession();
+        const token = session.getIdToken().getJwtToken();
+        const response = await fetch('/api/avatar-url', { // Używamy nowego endpointu
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Nie udało się pobrać awatara');
+        const data = await response.json();
+        if (data.avatarUrl) {
+          const freshUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
+          setAvatarUrl(freshUrl);
+        }
+      } catch (error) {
+        console.error("Błąd wczytywania awatara:", error);
+      } finally {
+        setAvatarLoading(false); // Kończymy ładowanie (nawet jeśli błąd)
+      }
+    };
+    fetchAvatarUrl();
+  }, []);
 
 const playJajcoSound = () => {
     const audio = new Audio('/jajo.mp3');
@@ -94,7 +118,11 @@ return (
             className="profile-button" 
             title="Przejdź do profilu"
           >
-            👤
+            <img 
+              src={avatarUrl || '/default_avatar.png'} 
+              alt="Awatar" 
+              className="navbar-avatar" 
+            />
           </Link>
           
           <button onClick={signOut} className="sign-out-button">
@@ -114,7 +142,11 @@ return (
           } />
           
           <Route path="/profile" element={
-            <UserProfile user={user} />
+            <UserProfile 
+              user={user} 
+              currentAvatarUrl={avatarUrl}
+              setAppAvatarUrl={setAvatarUrl} 
+            />
           } />
 
         </Routes>

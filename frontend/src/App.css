@@ -142,3 +142,13 @@ body, html {
   color: inherit; /* Dziedziczy biały kolor tekstu */
   text-decoration: none; /* Usuwa podkreślenie */
 }
+
+/* Plik: frontend/src/App.css (dodaj na końcu) */
+.navbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%; /* Robi kółko */
+  object-fit: cover; /* Kadruje obraz, zamiast go rozciągać */
+  border: 1.5px solid #bd93f7; /* Pasująca ramka */
+  vertical-align: middle; /* Lepsze wyrównanie z tekstem */
+}

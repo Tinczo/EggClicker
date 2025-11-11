@@ -89,3 +89,61 @@
   color: #61dafb; /* Domyślnie niebieski dla sukcesu */
   margin-bottom: 30px;
 }
+
+/* Plik: frontend/src/components/UserProfile.css (dodaj na końcu) */
+
+.profile-form input[type="file"] {
+  padding: 10px;
+  background-color: #3a3f4b;
+  border-radius: 4px;
+}
+
+.crop-container {
+  margin-top: 15px;
+  background-color: #20232a;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* Upewnij się, że obrazek w edytorze nie jest za duży */
+.ReactCrop__image {
+  max-width: 100%;
+  max-height: 400px;
+}
+
+/* Plik: frontend/src/components/UserProfile.css (dodaj na końcu) */
+
+.profile-avatar-preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%; /* Kółko */
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 2px solid #555;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* "Hack" na tłumaczenie przycisku input[type=file] */
+.file-upload-label {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.file-upload-label:hover {
+  background-color: #777;
+}
+
+.file-name-display {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #aaa;
+  display: block;
+}

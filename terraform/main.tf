@@ -36,6 +36,37 @@ resource "aws_s3_bucket" "egg_clicker_files" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "egg_clicker_files_access" {
+  bucket = aws_s3_bucket.egg_clicker_files.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+# 2. Dodajemy Politykę Bucketa, która pozwala na publiczny ODCZYT
+resource "aws_s3_bucket_policy" "egg_clicker_files_policy" {
+  bucket = aws_s3_bucket.egg_clicker_files.id
+
+  # Ta polityka zezwala na operację "GetObject" (pobieranie pliku)
+  # każdemu (*) dla każdego obiektu (`/*`) w tym buckecie.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.egg_clicker_files.arn}/*"
+      },
+    ]
+  })
+
+  depends_on = [aws_s3_bucket_public_access_block.egg_clicker_files_access]
+}
+
 # 1. Repozytorium dla obrazu backendu
 resource "aws_ecr_repository" "egg_clicker_backend" {
   name = "egg-clicker-backend" # Nazwa repozytorium w AWS
