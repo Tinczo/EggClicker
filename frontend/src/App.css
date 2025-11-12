@@ -152,3 +152,17 @@ body, html {
   border: 1.5px solid #bd93f7; /* Pasująca ramka */
   vertical-align: middle; /* Lepsze wyrównanie z tekstem */
 }
+
+
+
+.navbar-link {
+  color: #bd93f7;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 15px;
+  transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: #bd93f7;
+}

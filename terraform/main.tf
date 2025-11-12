@@ -28,6 +28,8 @@ resource "aws_s3_bucket" "egg_clicker_files" {
   # WAŻNE: Zmień tę nazwę na globalnie unikalną!
   bucket = "egg-clicker-bucket-266586"
 
+  force_destroy = true
+
   # Dodajemy tagi - dobra praktyka do oznaczania zasobów
   tags = {
     Name        = "EggClicker Asset Storage"

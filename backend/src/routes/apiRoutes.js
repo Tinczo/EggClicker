@@ -33,7 +33,6 @@ const upload = multer({
   }
 }).single('avatar');
 
-// 1. GET /clicks - Pobiera aktualną liczbę kliknięć z bazy
 router.get('/clicks', checkJwt, async (req, res) => {
 
   const userId = req.auth.sub;
@@ -59,11 +58,6 @@ router.get('/clicks', checkJwt, async (req, res) => {
   }
 });
 
-// 2. POST /click - Rejestruje (atomowo) nowe kliknięcie w bazie
-// Plik: backend/src/routes/apiRoutes.js
-
-
-// 2. POST /click - WERSJA OSTATECZNA (z poprawną nazwą użytkownika)
 router.post('/click', checkJwt, async (req, res) => {
   // "Ochroniarz" (checkJwt) dał nam ID oraz nazwę użytkownika z tokenu
   const userId = req.auth.sub;
@@ -83,14 +77,15 @@ router.post('/click', checkJwt, async (req, res) => {
     Key: {
       ItemID: userId, // Klucz główny
     },
-    // Przywracamy naszą pełną logikę zapisu
-    UpdateExpression: 'SET clickCount = if_not_exists(clickCount, :start) + :inc, username = :u',
+    // Aktualizujemy 3 rzeczy: licznik, nazwe ORAZ klucz GSI
+    UpdateExpression: 'SET clickCount = if_not_exists(clickCount, :start) + :inc, username = :u, leaderboard_pk = :pk',
     ExpressionAttributeValues: {
       ':inc': 1,
       ':start': 0,
-      ':u': username, // Przekazujemy poprawną nazwę użytkownika do zapisu
+      ':u': username,
+      ':pk': 'global_ranking' // Nasza stala wartosc dla rankingu
     },
-    ReturnValues: 'UPDATED_NEW', // Zwróć zaktualizowane wartości
+    ReturnValues: 'UPDATED_NEW',
   };
 
   try {
@@ -102,6 +97,44 @@ router.post('/click', checkJwt, async (req, res) => {
   } catch (err) {
     console.error(`Błąd zapisu do DynamoDB dla ${userId}:`, err);
     res.status(500).json({ error: 'Nie można zapisać kliknięcia' });
+  }
+});
+
+router.get('/ranking', async (req, res) => {
+  const lastKey = req.query.pageKey ? JSON.parse(Buffer.from(req.query.pageKey, 'base64').toString('ascii')) : undefined;
+
+  const params = {
+    TableName: tableName,
+    IndexName: 'LeaderboardIndex', // Uzywamy POPRAWNEGO indeksu
+
+    KeyConditionExpression: 'leaderboard_pk = :pk',
+    ExpressionAttributeValues: {
+      ':pk': 'global_ranking'
+    },
+
+    ScanIndexForward: false, // Sortuj malejaco (najlepsi na gorze)
+    Limit: 10, 
+    ExclusiveStartKey: lastKey 
+  };
+
+  try {
+    const data = await docClient.query(params).promise();
+
+    const ranking = data.Items;
+    const nextKey = data.LastEvaluatedKey 
+      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64') 
+      : null;
+
+    console.log(`GET /api/ranking - Zwrócono ${ranking.length} użytkowników.`);
+
+    res.json({
+      ranking: ranking,
+      nextPageKey: nextKey
+    });
+
+  } catch (err) {
+    console.error("Błąd pobierania rankingu:", err);
+    res.status(500).json({ error: 'Nie można pobrać rankingu' });
   }
 });
 
@@ -189,6 +222,24 @@ router.post('/upload-avatar', checkJwt, (req, res) => {
 router.get('/health', (req, res) => {
   // Po prostu odpowiedz, że żyjesz
   res.status(200).json({ status: 'ok' });
+});
+
+router.post('/feedback', checkJwt, (req, res) => {
+  const userId = req.auth.sub;
+  const username = req.auth['cognito:username'];
+
+  const { message } = req.body;
+
+  if (!message || message.trim() === '') {
+    return res.status(400).json({ error: 'Wiadomość nie może być pusta' });
+  }
+
+  console.log(`--- NOWA OPINIA ---`);
+  console.log(`Od Użytkownika: ${username} (${userId})`);
+  console.log(`Wiadomość: ${message}`);
+  console.log(`---------------------`);
+
+  res.status(200).json({ status: 'success', message: 'Dziękujemy za Twoją opinię!' });
 });
 
 module.exports = router;

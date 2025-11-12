@@ -5,6 +5,8 @@ import './App.css';
 import ClickCounter from './components/ClickCounter';
 import Egg from './components/Egg';
 import UserProfile from './components/UserProfile';
+import Ranking from './components/Ranking';
+import Feedback from './components/Feedback';
 
 import { Auth } from 'aws-amplify';
 import { withAuthenticator } from '@aws-amplify/ui-react';
@@ -111,6 +113,10 @@ return (
         </Link>
         
         <div className="user-info">
+
+        <Link to="/ranking" className="navbar-link">Ranking</Link>
+        <Link to="/feedback" className="navbar-link">Opinie</Link>
+
           <span>Witaj, {user.username}!</span>
           
           <Link 
@@ -148,6 +154,9 @@ return (
               setAppAvatarUrl={setAvatarUrl} 
             />
           } />
+
+          <Route path="/ranking" element={<Ranking />} />
+          <Route path="/feedback" element={<Feedback />} />
 
         </Routes>
         

@@ -1,19 +1,32 @@
-# ----------------------------------------
-# --- Baza Danych DynamoDB  ---
-# ----------------------------------------
-
 resource "aws_dynamodb_table" "egg_clicker_table" {
   name         = "EggClickerData"
-  billing_mode = "PAY_PER_REQUEST" # Płacimy tylko za to, co użyjemy (idealne!)
+  billing_mode = "PAY_PER_REQUEST" 
 
-  # Definiujemy nasz klucz główny (jak "ID" w SQL)
-  # Będziemy trzymać różne dane, identyfikując je po "ItemID"
+  # Klucz główny (bez zmian)
+  hash_key = "ItemID"
   attribute {
     name = "ItemID"
-    type = "S" # S = String (Ciąg znaków)
+    type = "S"
+  }
+  
+  attribute {
+    name = "leaderboard_pk" # Nowy klucz partycji dla GSI
+    type = "S"
+  }
+  attribute {
+    name = "clickCount" # Teraz klucz sortowania dla GSI
+    type = "N"
   }
 
-  hash_key = "ItemID" # Informujemy DynamoDB, że "ItemID" to nasz klucz
+  global_secondary_index {
+    name            = "LeaderboardIndex" # Nowa, lepsza nazwa
+    
+    hash_key        = "leaderboard_pk"
+    range_key       = "clickCount"
+    
+    projection_type = "INCLUDE"
+    non_key_attributes = ["username"] 
+  }
 
   tags = {
     Name    = "EggClicker-Data-Table"

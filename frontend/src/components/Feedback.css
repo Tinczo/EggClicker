@@ -1,0 +1,73 @@
+/* Plik: frontend/src/components/Feedback.css */
+
+.feedback-container {
+  width: 100%;
+  max-width: 600px; /* Nieco szerszy niż profil */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.feedback-container p {
+  color: #ccc;
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.feedback-form label {
+  text-align: left;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.feedback-form textarea {
+  width: 100%;
+  box-sizing: border-box; /* Ważne */
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background-color: #3a3f4b;
+  color: white;
+  font-size: 1rem;
+  font-family: inherit; /* Użyj tej samej czcionki */
+  margin-bottom: 20px;
+}
+
+.feedback-submit-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #bd93f7;
+  color: #20232a;
+  transition: all 0.2s ease;
+}
+
+.feedback-submit-button:hover {
+  background-color: #d4baf9;
+}
+
+.feedback-status {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #bd93f7; /* Kolor sukcesu */
+}
+
+.feedback-back-link {
+  margin-top: 20px;
+  color: #aaa;
+  text-decoration: none;
+}
+
+.feedback-back-link:hover {
+  color: #d4baf9;
+}
