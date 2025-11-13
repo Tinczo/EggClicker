@@ -30,11 +30,17 @@
   text-align: center;
 }
 
-.ranking-table td:nth-child(2) { /* Nazwa */
+
+.ranking-table td:nth-child(2) { /* Awatar */
+  width: 10%;
+  text-align: center;
+}
+
+.ranking-table td:nth-child(3) { /* Nazwa */
   width: 60%;
 }
 
-.ranking-table td:nth-child(3) { /* Kliknięcia */
+.ranking-table td:nth-child(4) { /* Kliknięcia */
   width: 30%;
   font-weight: bold;
   color: #fff;
@@ -71,4 +77,25 @@
 
 .ranking-message.error {
   color: #ff6b6b;
+}
+
+/* Plik: frontend/src/components/Ranking.css (dodaj na końcu) */
+
+.ranking-back-link {
+  margin-top: 20px;
+  color: #aaa;
+  text-decoration: none;
+
+}
+
+.ranking-back-link:hover {
+  color: #d4baf9;
+}
+
+.ranking-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Robi kółko */
+  object-fit: cover; /* Kadruje, zamiast rozciągać */
+  vertical-align: middle; /* Wyrównuje w linii z tekstem */
 }

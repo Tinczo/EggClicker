@@ -25,7 +25,7 @@ resource "aws_dynamodb_table" "egg_clicker_table" {
     range_key       = "clickCount"
     
     projection_type = "INCLUDE"
-    non_key_attributes = ["username"] 
+    non_key_attributes = ["username", "avatarUrl"] 
   }
 
   tags = {
