@@ -8,7 +8,32 @@
 Write-Host "Starting Full Setup..." -ForegroundColor Cyan
 
 # --- Etap 1: Terraform Apply ---
-Write-Host "--- Step 1: Deploying Infrastructure (terraform apply) ---"
+Write-Host "--- Step 1: Install lambda dependencies  ---"
+try {
+    Set-Location -Path "lambda_functions/podium_checker"
+} catch {
+    Write-Error "ERROR: Cannot find /lambda_functions/podium_checker folder. Make sure you are running this script from the project root."
+    exit 1
+}
+
+# Uzywamy -auto-approve, aby pominac pytanie "yes"
+npm install
+
+# Sprawdz, czy ostatnia komenda sie udala
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "ERROR during 'npm install'. Aborting script."
+    Set-Location -Path ".."
+    Set-Location -Path ".." # Wroc do folderu glownego
+    exit 1
+}
+
+Write-Host "Lambda dependencies installed successfully." -ForegroundColor Green
+Set-Location -Path ".."
+Set-Location -Path ".."
+
+
+# --- Etap 1: Terraform Apply ---
+Write-Host "--- Step 2: Deploying Infrastructure (terraform apply) ---"
 try {
     Set-Location -Path "terraform"
 } catch {
@@ -30,7 +55,7 @@ Write-Host "Infrastructure deployed successfully." -ForegroundColor Green
 Set-Location -Path ".."
 
 # --- Etap 2: Generowanie .env ---
-Write-Host "--- Step 2: Generating .env files ---"
+Write-Host "--- Step 3: Generating .env files ---"
 try {
     .\generate_env_files.ps1
 } catch {
@@ -40,7 +65,7 @@ try {
 }
 
 # --- Etap 3: Wypychanie obrazow ---
-Write-Host "--- Step 3: Building and Pushing Docker images (push_to_ecr) ---"
+Write-Host "--- Step 4: Building and Pushing Docker images (push_to_ecr) ---"
 try {
     .\push_to_ecr.ps1
 } catch {
@@ -50,7 +75,7 @@ try {
 }
 
 # --- Etap 4: Pobieranie adresu URL ---
-Write-Host "--- Step 4: Fetching Application URL ---"
+Write-Host "--- Step 5: Fetching Application URL ---"
 try {
     Set-Location -Path "terraform"
     # Uzywamy -raw aby dostac tylko czysty tekst, bez cudzyslowow

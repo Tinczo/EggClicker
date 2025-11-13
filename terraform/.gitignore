@@ -15,3 +15,5 @@ crash.log
 # 4. Pliki zmiennych z wrażliwymi danymi
 terraform.tfvars
 
+# 5. Archiwa z kodem funkcji Lambda
+*.zip

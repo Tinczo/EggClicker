@@ -33,3 +33,19 @@ resource "aws_dynamodb_table" "egg_clicker_table" {
     Project = "Egg Clicker"
   }
 }
+
+resource "aws_dynamodb_table" "egg_clicker_state" {
+  name         = "EggClickerState"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "StateID"
+  attribute {
+    name = "StateID"
+    type = "S"
+  }
+
+  tags = {
+    Name    = "EggClicker-State-Table"
+    Project = "Egg Clicker"
+  }
+}
