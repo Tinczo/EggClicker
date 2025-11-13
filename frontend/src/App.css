@@ -166,3 +166,89 @@ body, html {
 .navbar-link:hover {
   color: #bd93f7;
 }
+
+/* Plik: frontend/src/App.css (dodaj na końcu) */
+
+.notifications-container {
+  position: relative; /* Kluczowe dla pozycjonowania dropdownu */
+}
+
+.notification-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #61dafb;
+  cursor: pointer;
+  position: relative;
+  margin-right: 15px;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4757;
+  border-radius: 50%;
+  border: 2px solid #20232a;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  width: 300px;
+  background-color: #3a3f4b;
+  border: 1px solid #555;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #555;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.unread {
+  background-color: #4a505c;
+  color: #fff;
+  font-weight: bold;
+}
+
+@keyframes bell-ring {
+  0%, 50%, 100% { transform: rotate(0); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+}
+
+/* Zastosuj animację do przycisku, gdy ma klasę .unread-bell */
+.notification-button.unread-bell {
+  animation: bell-ring 1s ease-in-out;
+}
+
+/* Plik: frontend/src/App.css */
+
+.notification-message {
+  margin-bottom: 4px;
+}
+
+.notification-date {
+  font-size: 0.75rem; /* Mniejsza czcionka */
+  color: #888; /* Szary kolor */
+  text-align: right; /* Wyrównaj do prawej */
+}
+
+/* Dla nieprzeczytanych data może być jaśniejsza */
+.notification-item.unread .notification-date {
+  color: #ccc;
+}

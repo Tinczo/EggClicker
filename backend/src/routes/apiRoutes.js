@@ -219,10 +219,6 @@ router.post('/upload-avatar', checkJwt, (req, res) => {
   });
 });
 
-router.get('/health', (req, res) => {
-  // Po prostu odpowiedz, że żyjesz
-  res.status(200).json({ status: 'ok' });
-});
 
 router.post('/feedback', checkJwt, (req, res) => {
   const userId = req.auth.sub;
@@ -240,6 +236,105 @@ router.post('/feedback', checkJwt, (req, res) => {
   console.log(`---------------------`);
 
   res.status(200).json({ status: 'success', message: 'Dziękujemy za Twoją opinię!' });
+});
+
+router.get('/notifications', checkJwt, async (req, res) => {
+  const userId = req.auth.sub; // Wiemy, dla kogo szukamy
+
+  const params = {
+    TableName: tableName,
+    IndexName: 'UserNotificationsIndex', // Używamy naszego nowego indeksu
+
+    // "Daj mi wszystko, gdzie 'userId' to ID zalogowanego użytkownika"
+    KeyConditionExpression: 'userId = :uid',
+    ExpressionAttributeValues: {
+      ':uid': userId
+    },
+
+    // Zwróć najnowsze powiadomienia jako pierwsze
+    ScanIndexForward: false, 
+    Limit: 20 // Ogranicz do ostatnich 20
+  };
+
+  try {
+    const data = await docClient.query(params).promise();
+    console.log(`GET /api/notifications dla ${userId} - Zwrócono ${data.Items.length} powiadomień.`);
+    res.json(data.Items); // Zwróć listę powiadomień
+
+  } catch (err) {
+    console.error("Błąd pobierania powiadomień:", err);
+    res.status(500).json({ error: 'Nie można pobrać powiadomień' });
+  }
+});
+
+router.post('/notifications/mark-read', checkJwt, async (req, res) => {
+  const userId = req.auth.sub;
+  console.log(`POST /api/notifications/mark-read dla ${userId}`);
+
+  try {
+    // --- KROK 1: Znajdź wszystkie NIEPRZECZYTANE powiadomienia ---
+    // Używamy tego samego GSI co wcześniej, ale dodajemy warunek "FilterExpression"
+    // Niestety, nie możemy filtrować po 'isRead' w kluczu, więc musimy to zrobić po stronie serwera.
+
+    const queryParams = {
+      TableName: tableName,
+      IndexName: 'UserNotificationsIndex',
+      KeyConditionExpression: 'userId = :uid',
+      ExpressionAttributeValues: { ':uid': userId },
+      // Chcemy znaleźć tylko te, które są nieprzeczytane
+      FilterExpression: 'isRead = :isReadVal',
+      ExpressionAttributeValues: {
+        ':uid': userId,
+        ':isReadVal': false // Szukaj tylko tych z `isRead: false`
+      },
+      ProjectionExpression: 'ItemID' // Potrzebujemy tylko ich kluczy głównych
+    };
+
+    const data = await docClient.query(queryParams).promise();
+    const unreadItems = data.Items;
+
+    if (unreadItems.length === 0) {
+      console.log("Brak nieprzeczytanych powiadomien do oznaczenia.");
+      return res.json({ status: 'success', message: 'Brak zmian' });
+    }
+
+    console.log(`Znaleziono ${unreadItems.length} nieprzeczytanych powiadomien do aktualizacji.`);
+
+    // --- KROK 2: Zaktualizuj każde powiadomienie (w paczce) ---
+    // Tworzymy listę żądań aktualizacji
+    const updatePromises = unreadItems.map(item => {
+      const updateParams = {
+        TableName: tableName,
+        Key: {
+          ItemID: item.ItemID // Używamy klucza głównego
+        },
+        UpdateExpression: 'SET isRead = :isReadVal',
+        ExpressionAttributeValues: {
+          ':isReadVal': true // Ustaw na "przeczytane"
+        }
+      };
+      return docClient.update(updateParams).promise();
+    });
+
+    // Uruchom wszystkie aktualizacje równolegle
+    await Promise.all(updatePromises);
+
+    res.json({ status: 'success', message: `Oznaczono ${unreadItems.length} powiadomien jako przeczytane` });
+
+  } catch (err) {
+    // Błąd "FilterExpression" może się pojawić, jeśli GSI nie jest jeszcze w pełni zbudowany
+    if (err.code === 'ValidationException' && err.message.includes('FilterExpression')) {
+         console.warn("Ostrzezenie: GSI UserNotificationsIndex wciaz sie buduje. Nie mozna jeszcze filtrowac.");
+         return res.json({ status: 'success', message: 'Indeks w trakcie budowy' });
+    }
+    console.error("Błąd oznaczania powiadomień jako przeczytane:", err);
+    res.status(500).json({ error: 'Nie można zaktualizować powiadomień' });
+  }
+});
+
+router.get('/health', (req, res) => {
+  // Po prostu odpowiedz, że żyjesz
+  res.status(200).json({ status: 'ok' });
 });
 
 module.exports = router;

@@ -24,55 +24,44 @@ function App({ signOut, user }) {
 
   const [avatarUrl, setAvatarUrl] = useState(null); // URL awatara
   const [avatarLoading, setAvatarLoading] = useState(true); // Status ładowania awatara
+  
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [hasUnread, setHasUnread] = useState(false);
 
 
 useEffect(() => {
-  const fetchInitialClicks = async () => {
+  const loadInitialData = async () => {
     try {
       setIsLoading(true);
-
       const session = await Auth.currentSession();
       const token = session.getIdToken().getJwtToken();
 
-      const response = await fetch(`${API_URL}/api/clicks`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const clicksResponse = await fetch('/api/clicks', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
+      const clicksData = await clicksResponse.json();
+      setClickCount(clicksData.count);
 
-      const data = await response.json();
-      setClickCount(data.count);
+      const avatarResponse = await fetch('/api/avatar-url', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const avatarData = await avatarResponse.json();
+      if (avatarData.avatarUrl) {
+        setAvatarUrl(`${avatarData.avatarUrl}?t=${new Date().getTime()}`);
+      }
+
+      await fetchNotifications();
+
     } catch (error) {
-      console.error('Błąd podczas pobierania kliknięć:', error);
+      console.error('Błąd podczas ładowania danych:', error);
     } finally {
       setIsLoading(false);
+      setAvatarLoading(false);
     }
   };
-  fetchInitialClicks();
+  loadInitialData();
 }, []);
-
-useEffect(() => {
-    const fetchAvatarUrl = async () => {
-      try {
-        const session = await Auth.currentSession();
-        const token = session.getIdToken().getJwtToken();
-        const response = await fetch('/api/avatar-url', { // Używamy nowego endpointu
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error('Nie udało się pobrać awatara');
-        const data = await response.json();
-        if (data.avatarUrl) {
-          const freshUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
-          setAvatarUrl(freshUrl);
-        }
-      } catch (error) {
-        console.error("Błąd wczytywania awatara:", error);
-      } finally {
-        setAvatarLoading(false); // Kończymy ładowanie (nawet jeśli błąd)
-      }
-    };
-    fetchAvatarUrl();
-  }, []);
 
 const playJajcoSound = () => {
     const audio = new Audio('/jajo.mp3');
@@ -105,6 +94,57 @@ const playJajcoSound = () => {
     }
   };
 
+const fetchNotifications = async () => {
+  try {
+    const session = await Auth.currentSession();
+    const token = session.getIdToken().getJwtToken();
+    const response = await fetch('/api/notifications', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Nie udało się pobrać powiadomień');
+
+    const data = await response.json();
+    setNotifications(data);
+
+    if (data.some(n => n.isRead === false)) {
+      setHasUnread(true);
+    } else {
+      setHasUnread(false);
+    }
+
+  } catch (error) {
+    console.error("Błąd wczytywania powiadomień:", error);
+  }
+};
+
+  const handleBellClick = async () => {
+    setShowNotifications(prev => !prev);
+
+    if (hasUnread) {
+      console.log("Oznaczanie powiadomien jako przeczytane...");
+      
+      setHasUnread(false); 
+      
+      const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
+      setNotifications(updatedNotifications);
+
+      try {
+        const session = await Auth.currentSession();
+        const token = session.getIdToken().getJwtToken();
+        
+        await fetch('/api/notifications/mark-read', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+
+      } catch (error) {
+        console.error("Błąd oznaczania powiadomień jako przeczytane:", error);
+        setHasUnread(true); 
+      }
+    }
+  };
+
 return (
     <div className="App">
       <header className="app-navbar">
@@ -116,6 +156,41 @@ return (
 
         <Link to="/ranking" className="navbar-link">Ranking</Link>
         <Link to="/feedback" className="navbar-link">Opinie</Link>
+
+          <div className="notifications-container">
+            <button 
+              onClick={handleBellClick}
+              className={`notification-button ${hasUnread ? 'unread-bell' : ''}`} 
+              title="Powiadomienia"
+            >
+              🔔
+              {/* Czerwona kropka, jeśli są nieprzeczytane */}
+              {hasUnread && <div className="notification-dot"></div>}
+            </button>
+
+            {/* Rozwijana lista powiadomień (zostaje bez zmian) */}
+            {showNotifications && (
+              <div className="notifications-dropdown">
+                {notifications.length === 0 ? (
+                  <div className="notification-item">Brak powiadomień</div>
+                ) : (
+                  notifications.map(n => (
+                    <div key={n.ItemID} className={`notification-item ${!n.isRead ? 'unread' : ''}`}>
+                      <div className="notification-message">{n.message}</div>
+                      <div className="notification-date">
+                        {new Date(n.timestamp).toLocaleString('pl-PL', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
           <span>Witaj, {user.username}!</span>
           

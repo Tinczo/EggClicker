@@ -18,6 +18,15 @@ resource "aws_dynamodb_table" "egg_clicker_table" {
     type = "N"
   }
 
+  attribute { 
+    name = "userId" 
+    type = "S" 
+  }
+  attribute { 
+    name = "timestamp" 
+    type = "N" 
+  }
+
   global_secondary_index {
     name            = "LeaderboardIndex" # Nowa, lepsza nazwa
     
@@ -26,6 +35,15 @@ resource "aws_dynamodb_table" "egg_clicker_table" {
     
     projection_type = "INCLUDE"
     non_key_attributes = ["username", "avatarUrl"] 
+  }
+
+  global_secondary_index {
+    name            = "UserNotificationsIndex"
+    
+    hash_key        = "userId"
+    range_key       = "timestamp"
+    
+    projection_type = "ALL"
   }
 
   tags = {
